@@ -18,13 +18,24 @@ namespace WaterProject.API.Controllers
         }
 
         [HttpGet("AllProjects")]
-        public IEnumerable<Project> GetProjects()
+        public IActionResult GetProjects(int pageSize = 10, int pageNum = 1)
         {
             // Go into DB, go into Projects table, give me the
             // results of that table in a List
-            var something = _waterContext.Projects.ToList();
+            var something = _waterContext.Projects
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            
+            var totalNumProjects = _waterContext.Projects.Count();
 
-            return something;
+            var someObject = new
+            {
+                Projects = something,
+                TotalNumProjects = totalNumProjects
+            };
+            
+            return Ok(someObject);
         }
 
         [HttpGet("FunctionalProjects")]
